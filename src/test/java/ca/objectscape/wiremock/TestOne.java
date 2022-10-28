@@ -2,12 +2,11 @@ package ca.objectscape.wiremock;
 
 import java.io.IOException;
 
-import ca.objectscape.wiremock.server.TestServer;
 import ca.objectscape.wiremock.client.TestClient;
 import ca.objectscape.wiremock.client.TestClient.TestResponse;
+import ca.objectscape.wiremock.server.TestServer;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.ClassRule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,5 +102,29 @@ public class TestOne {
 
     assertThat(response.code, is(200));
     assertThat(response.content, is("[{\"id\": \"org-1\"},{\"id\": \"org-2\"}]"));
+
+    testServer.resetScenario("Org list");
+  }
+
+  @Test
+  public void testOrgAdditionFlow2() throws IOException {
+    // initially there's only org-1
+    TestResponse response = testClient.get("http://localhost:8080/orgs");
+    logger.info("Response: {}", response);
+
+    assertThat(response.code, is(200));
+    assertThat(response.content, is("[{\"id\": \"org-1\"}]"));
+
+    // add org-2 by changing scenario's state
+    testServer.setScenarioState("Org list", "Org 2 added");
+
+    // now there are two orgs
+    response = testClient.get("http://localhost:8080/orgs");
+    logger.info("Response: {}", response);
+
+    assertThat(response.code, is(200));
+    assertThat(response.content, is("[{\"id\": \"org-1\"},{\"id\": \"org-2\"}]"));
+
+    testServer.resetScenario("Org list");
   }
 }

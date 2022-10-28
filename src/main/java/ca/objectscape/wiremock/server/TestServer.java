@@ -74,9 +74,11 @@ public class TestServer
     // mock new org addition
     givenThat(post(urlEqualTo("/orgs")).inScenario("Org list")
         .whenScenarioStateIs(STARTED)
+        .willSetStateTo("Org 2 added")
         .withRequestBody(containing("org-2"))
-        .willReturn(aResponse().withStatus(201))
-        .willSetStateTo("Org 2 added"));
+        .willReturn(aResponse()
+            .withStatus(201)
+        ));
 
     // mock final org list
     givenThat(get(urlEqualTo("/orgs")).inScenario("Org list")
