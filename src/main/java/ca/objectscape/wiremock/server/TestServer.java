@@ -20,6 +20,7 @@ public class TestServer
   public TestServer() {
     super(WireMockConfiguration.wireMockConfig()
         .port(8080)
+        //.dynamicPort()
         .extensions(new ResponseTemplateTransformer(false)));
   }
 

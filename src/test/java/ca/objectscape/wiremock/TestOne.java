@@ -21,14 +21,16 @@ public class TestOne {
 
   final Logger logger = LoggerFactory.getLogger(TestOne.class);
 
-  static TestServer testServer = new TestServer();
+  static TestServer testServer;
 
-  static TestClient testClient = new TestClient();
+  static TestClient testClient;
 
   @BeforeClass
   public static void setup() {
+    testServer = new TestServer();
     testServer.start();
     testServer.initialSetup();
+    testClient = new TestClient(testServer.port());
   }
 
   @AfterClass

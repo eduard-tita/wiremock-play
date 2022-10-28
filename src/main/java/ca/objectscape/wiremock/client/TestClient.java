@@ -12,16 +12,32 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.HttpEntity;
 import org.apache.hc.core5.http.io.entity.StringEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestClient
 {
+  final Logger logger = LoggerFactory.getLogger(TestClient.class);
+
   CloseableHttpClient httpClient = HttpClients.createDefault();
 
+  int port;
+
+  public TestClient(int port) {
+    this.port = port;
+    logger.info("Port set to: {}", port);
+  }
+
   public TestResponse get(String url) throws IOException {
-    HttpGet request = new HttpGet(url);
+    HttpGet request = new HttpGet(adjustPort(url));
+    logger.info("GET: {}", url);
     CloseableHttpResponse httpResponse = httpClient.execute(request);
     String content = convertResponseToString(httpResponse);
     return new TestResponse(httpResponse.getCode(), content);
+  }
+
+  private String adjustPort(final String url) {
+    return port != 8080 ? url.replace(":8080", ":" + port) : url;
   }
 
   private String convertResponseToString(CloseableHttpResponse response) throws IOException {
@@ -33,7 +49,8 @@ public class TestClient
   }
 
   public TestResponse post(final String url, final String body) throws IOException {
-    HttpPost request = new HttpPost(url);
+    HttpPost request = new HttpPost(adjustPort(url));
+    logger.info("POST: {}", url);
     HttpEntity entity = new StringEntity(body, ContentType.APPLICATION_JSON);
     request.setEntity(entity);
     CloseableHttpResponse httpResponse = httpClient.execute(request);
